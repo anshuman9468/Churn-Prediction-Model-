@@ -1,6 +1,6 @@
 Telecom Customer Churn Prediction Model
 Overview
-This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, REST API backend, and interactive frontend dashboard for real-time churn prediction and customer risk analysis.
+This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, FAST API backend, and interactive frontend dashboard for real-time churn prediction from streamlit and customer risk analysis.
 Project Architecture
 ┌─────────────────┐
 │  Frontend UI    │  React/Vue Dashboard
@@ -321,7 +321,7 @@ Risk Classification (High/Low)
 CRM System / Marketing Automation
 Integration Options
 Real-time Prediction API
-pythonfrom flask import Flask, request, jsonify
+pythonfrom fast import Fast, request, jsonify
 import joblib
 
 app = Flask(__name__)
@@ -407,7 +407,7 @@ telecom-churn-prediction/
 ├── .venv/                          # Virtual environment (not tracked in git)
 │
 ├── backend/                        # Backend API and model serving
-│   ├── app.py                      # Flask/FastAPI application
+│   ├── app.py                      # FastAPI application
 │   ├── models/                     # Saved model artifacts
 │   │   ├── churn_xgb.pkl          # Trained XGBoost model
 │   │   └── threshold.pkl          # Optimal prediction threshold
