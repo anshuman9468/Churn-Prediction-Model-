@@ -547,19 +547,19 @@ Running the Backend API
 bashcd backend
 python app.py
 
-# API will be available at http://localhost:5000
+# API will be available at https://churn-prediction-2qrp.onrender.com/
 Running the Frontend
 bashcd churn-frontend
 npm install
 npm start
 
-# Frontend will be available at http://localhost:3000
+# Frontend will be available at https://churn-frontend-g3ku8j45b7mfsg6s4ztjfy.streamlit.app/
 Using the Jupyter Notebook
 bash# Install Jupyter in your virtual environment
 pip install jupyter
 
 # Launch notebook
-jupyter notebook notebook4b76edc9f8.ipynb
+Kaggle notebook notebook4b76edc9f8.ipynb
 Making Predictions via API
 bash# POST request to predict endpoint
 curl -X POST http://localhost:5000/api/predict \
