@@ -1,607 +1,357 @@
-Telecom Customer Churn Prediction Model
-Overview
-This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, REST API backend deployed on Render, and an interactive Streamlit frontend dashboard for real-time churn prediction and customer risk analysis.
-Project Architecture
-┌──────────────────────────────────────────────────────────────────┐
-│                         Frontend UI                              │
-│                   Streamlit UI               │
-│  • Customer risk analysis  • Batch predictions  • Visualization  │
-└───────────────────────────────┬──────────────────────────────────┘
-                                │
-                            HTTP/REST
-                                │
+📊 Telecom Customer Churn Prediction – End-to-End ML System
+
+A full-stack machine learning system for predicting customer churn in the telecommunications industry.
+This project uses an XGBoost classifier, a FastAPI backend, and a Streamlit frontend to deliver real-time churn prediction, customer risk analysis, and batch scoring capabilities.
+
+🚀 Project Overview
+
+Customer churn is one of the biggest revenue drains in the telecom industry. Early identification of at-risk customers enables companies to apply targeted retention strategies, significantly increasing customer lifetime value.
+
+This project focuses on maximizing recall (79.36%) to ensure the model captures as many potential churners as possible — aligning directly with business impact.
+
+🏗️ System Architecture
+┌──────────────────────────────────────────────┐
+│                 Streamlit UI                 │
+│ • Real-time predictions                      │
+│ • Batch scoring                              │
+│ • Customer risk analytics                    │
+└───────────────────────────────┬──────────────┘
+                                │ HTTP/REST
                                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                        Backend API                               │
-│                    FastAPI                      │
-│        • Prediction endpoint  • Preprocessing  • Model serving   │
-└───────────────────────────────┬──────────────────────────────────┘
-                                │
-                          Load Model
-                                │
+┌──────────────────────────────────────────────┐
+│                 FastAPI Backend              │
+│ • Prediction endpoint                        │
+│ • Preprocessing pipeline                     │
+│ • Model + threshold loading                  │
+└───────────────────────────────┬──────────────┘
+                                │ Load Model
                                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                         ML Model                                 │
-│              XGBoost Classifier (churn_xgb.pkl)                  │
-│               • Recall: 79.36%  • F1 Score: 0.642                │
-└──────────────────────────────────────────────────────────────────┘
-Key Features
-✅ High Recall Model (79.36%) - Captures maximum churners
-✅ REST API Backend - Easy integration with existing systems
-✅ Interactive Frontend - User-friendly dashboard for business users
-✅ Real-time Predictions - Instant churn risk assessment
-✅ Batch Processing - Score entire customer databases
-✅ Production Ready - Deployed and tested model artifacts
-Customer churn is a critical challenge in the telecom sector, directly impacting revenue and growth. Early identification of at-risk customers allows companies to implement targeted retention campaigns, reducing churn rates and improving customer lifetime value. This project focuses on maximizing recall to ensure we capture as many potential churners as possible.
-Dataset
-Source: Telco Customer Churn Dataset from Kaggle
+┌──────────────────────────────────────────────┐
+│               XGBoost ML Model               │
+│ • churn_xgb.pkl                               │
+│ • Recall = 79.36% (Primary metric)            │
+│ • F1 Score = 0.642                            │
+└──────────────────────────────────────────────┘
+
+✨ Key Features
+✔ High-Recall ML Model (79.36%)
+
+Captures maximum churners → critical for retention strategy.
+
+✔ FastAPI-Powered REST API
+
+Production-ready inference endpoint deployed on Render.
+
+✔ Interactive Streamlit Frontend
+
+Simple and intuitive interface for non-technical business users.
+
+✔ Real-Time + Batch Predictions
+
+Predict churn for individual customers or entire datasets.
+
+✔ Fully Deployed
+
+Backend: Render
+
+Frontend: Streamlit Cloud
+
+📂 Dataset
+
+Source: Telco Customer Churn Dataset (Kaggle)
 File: WA_Fn-UseC_-Telco-Customer-Churn.csv
-Size: 7,043 customers × 21 features
-Dataset Characteristics
+Shape: 7,043 rows × 21 features
 
-Target Variable: Churn (Yes/No)
-Class Distribution:
+Target Variable
 
-Non-churners: 5,174 customers (73.5%)
-Churners: 1,869 customers (26.5%)
-Class Imbalance: Dataset is imbalanced, requiring special handling
+Churn → Yes/No
 
+Imbalance: 73.5% non-churn / 26.5% churn
 
+Feature Categories
+Demographics
 
-Features
-The dataset includes comprehensive customer information across multiple categories:
-Customer Demographics:
+Gender
 
-Gender (Male/Female)
-SeniorCitizen (0/1)
-Partner (Yes/No)
-Dependents (Yes/No)
+SeniorCitizen
 
-Service Information:
+Partner
 
-Tenure (months with company)
-PhoneService, MultipleLines
-InternetService (DSL/Fiber optic/No)
-OnlineSecurity, OnlineBackup, DeviceProtection
-TechSupport, StreamingTV, StreamingMovies
+Dependents
 
-Account Information:
+Services
 
-Contract (Month-to-month/One year/Two year)
-PaperlessBilling (Yes/No)
-PaymentMethod (Electronic check/Mailed check/Bank transfer/Credit card)
+PhoneService
+
+MultipleLines
+
+InternetService (DSL / Fiber Optic / No)
+
+OnlineSecurity
+
+OnlineBackup
+
+DeviceProtection
+
+TechSupport
+
+StreamingTV
+
+StreamingMovies
+
+Account Information
+
+Tenure
+
+Contract
+
+PaperlessBilling
+
+PaymentMethod
+
 MonthlyCharges
+
 TotalCharges
 
-Data Preprocessing
-1. Data Cleaning
+🔧 Data Preprocessing
+✔ Cleaning
 
-Removed customerID column (not useful for prediction)
-Converted TotalCharges to numeric format
-Handled missing values in TotalCharges using median imputation
-Removed OnlineBackup column due to data quality issues
+Dropped customerID
 
-2. Feature Engineering
-Label Encoding applied to binary categorical features:
+Converted TotalCharges to numeric
 
-gender, Partner, Dependents, PhoneService, PaperlessBilling
-MultipleLines, OnlineSecurity, DeviceProtection, TechSupport
-StreamingTV, StreamingMovies, Churn (target variable)
+Filled missing values using median
 
-One-Hot Encoding applied to multi-category features:
+Removed OnlineBackup due to quality issues
 
-InternetService (DSL, Fiber optic, No)
-Contract (Month-to-month, One year, Two year)
-PaymentMethod (4 categories)
+✔ Encoding
 
-3. Final Feature Set
-After preprocessing: 22 input features used for model training
-Model Development
-Train-Test Split
+Label Encoding for binary fields
+One-Hot Encoding for multi-class fields
 
-Training Set: 80% (5,634 samples)
-Test Set: 20% (1,409 samples)
-Random State: 42 (for reproducibility)
+Final Feature Count: 22 engineered features
+🤖 Model Development
+Train/Test Split
 
-Models Implemented
-1. XGBoost Classifier (PRIMARY MODEL - SELECTED)
-Hyperparameters:
-pythonn_estimators=200        # Number of boosting rounds
-learning_rate=0.05      # Step size shrinkage
-max_depth=5             # Maximum tree depth
-subsample=0.8           # Subsample ratio of training instances
-colsample_bytree=0.8    # Subsample ratio of features
-scale_pos_weight=2.7    # Balancing of positive/negative weights (addresses class imbalance)
-Performance Metrics:
+Train: 80%
 
-Accuracy: 76.58%
-F1 Score: 0.642
-Recall: 79.36% ⭐ (Highest among all models)
+Test: 20%
 
-Key Advantages:
+random_state = 42
 
-Superior recall ensures maximum capture of potential churners
-Handles class imbalance effectively with scale_pos_weight
-Robust performance with gradient boosting
-Optimal threshold tuning for business objectives
+🟩 Primary Model — XGBoost Classifier
+Hyperparameters
+n_estimators=200
+learning_rate=0.05
+max_depth=5
+subsample=0.8
+colsample_bytree=0.8
+scale_pos_weight=2.7
 
-2. Logistic Regression (SECONDARY MODEL)
-Performance Metrics:
+Performance
+Metric	Score
+Accuracy	76.58%
+F1 Score	0.642
+⭐ Recall	79.36%
+Why Selected?
 
-Accuracy: 81.83% (Highest accuracy)
-F1 Score: 0.618
-Recall: 55.50%
+Highest recall → captures 24% more churners than Logistic Regression
 
-Characteristics:
+Balanced F1 score
 
-Best overall accuracy but lower recall
-Highly interpretable model
-Faster inference time
-Useful for understanding feature relationships
+Handles class imbalance effectively
 
-3. Decision Tree Classifier (EVALUATED)
-Performance Metrics:
+🟨 Secondary Model — Logistic Regression
+Metric	Score
+Accuracy	81.83%
+Recall	55.50%
+F1 Score	0.618
 
-Accuracy: 72.89%
-Not selected due to lower performance and overfitting concerns
+Good for interpretability, but not suitable for high-recall objectives.
 
-Model Selection Rationale
-Why XGBoost Over Logistic Regression?
-Despite Logistic Regression having 5.25% higher accuracy (81.83% vs 76.58%), XGBoost was selected as the primary model because:
+🎯 Business Metric Prioritization
 
-Superior Recall (79.36% vs 55.50%):
+Recall → Most important (don’t miss churners)
 
-Identifies 24% more actual churners
-Critical for retention campaign effectiveness
-Reduces customer loss by catching more at-risk customers
+F1 Score → Balanced evaluation
+
+Accuracy → Least important (misleading on imbalanced datasets)
+
+Example:
+
+A stupid model predicting “No Churn” for everyone gets 73.5% accuracy → completely useless.
+
+⚙️ Threshold Optimization
+
+The default 0.5 threshold is not suitable for imbalanced churn data.
+
+After optimization:
+Optimal threshold = 0.01
 
 
-Better F1 Score (0.642 vs 0.618):
+This aggressively maximizes recall for business impact.
 
-More balanced precision-recall tradeoff
-Better overall performance on imbalanced data
+📦 Saved Artifacts
+churn_xgb.pkl      # Trained XGBoost model
+threshold.pkl      # Optimized threshold = 0.01
 
+🌐 FastAPI Backend
 
-Business Impact:
+Example FastAPI code snippet:
 
-Missing a churner costs significantly more than a false positive
-Cost of retention offer << Cost of losing a customer
-High recall maximizes retention opportunities
-
-
-
-Evaluation Metrics Priority
-For churn prediction, metrics are prioritized as:
-
-Recall (Sensitivity) - MOST IMPORTANT
-
-Measures ability to identify actual churners
-Formula: True Positives / (True Positives + False Negatives)
-High recall = fewer missed churners
-Business goal: Don't let potential churners slip through
-
-
-F1 Score - SECONDARY
-
-Harmonic mean of precision and recall
-Provides balanced view of model performance
-Essential for imbalanced datasets
-Prevents over-optimization on accuracy alone
-
-
-Accuracy - TERTIARY
-
-Can be misleading with imbalanced classes
-A model predicting "no churn" for everyone could achieve 73.5% accuracy
-Fails to capture business cost asymmetry
-
-
-
-Why Not Just Accuracy?
-With a 73.5% / 26.5% class split, a naive model that always predicts "no churn" would achieve 73.5% accuracy while providing zero business value. This demonstrates why accuracy alone is insufficient for imbalanced classification problems.
-Model Optimization
-Threshold Tuning
-Performed threshold optimization to maximize F1 score while maintaining high recall:
-python# Tested thresholds from 0.0 to 1.0 in 0.01 increments
-Best threshold: 0.01
-Best F1 Score: 0.642
-This aggressive threshold ensures maximum churner identification, accepting more false positives in exchange for comprehensive coverage of actual churners.
-Handling Class Imbalance
-Strategy: Set scale_pos_weight=2.7 in XGBoost
-
-Calculated as ratio of negative to positive samples: 5174/1869 ≈ 2.77
-Penalizes misclassification of minority class (churners)
-Improves recall without sacrificing too much precision
-
-Model Deployment
-Saved Artifacts
-python# Model file
-churn_xgb.pkl           # Trained XGBoost model
-
-# Configuration file  
-threshold.pkl           # Optimal prediction threshold (0.01)
-Making Predictions
-pythonimport joblib
+from fastapi import FastAPI
+import joblib
 import numpy as np
 
-# Load model and threshold
-model = joblib.load('churn_xgb.pkl')
-threshold = joblib.load('threshold.pkl')
+app = FastAPI()
 
-# Predict on new data
-predictions = model.predict(new_customer_data)
-probabilities = model.predict_proba(new_customer_data)[:, 1]
+model = joblib.load("models/churn_xgb.pkl")
+threshold = joblib.load("models/threshold.pkl")
 
-# Apply custom threshold
-final_predictions = (probabilities >= threshold).astype(int)
+@app.post("/predict")
+def predict(data: dict):
+    features = preprocess(data)
+    prob = model.predict_proba([features])[0][1]
+    pred = int(prob >= threshold)
 
-# Get high-risk customers
-high_risk_indices = np.where(final_predictions == 1)[0]
-Business Impact & Use Cases
-Retention Campaign Targeting
-Primary Use Case: Identify at-risk customers for proactive retention
-
-Model outputs churn probability for each customer
-Customers with high probability receive targeted retention offers
-Campaigns can be personalized based on customer attributes
-
-Cost-Benefit Analysis
-Assumptions:
-
-Average revenue per customer: $64/month (from dataset)
-Customer lifetime value: ~$1,500 (based on average tenure)
-Retention offer cost: $50-100
-Retention success rate: 30-50%
-
-With XGBoost (79.36% Recall):
-
-Captures 1,483 out of 1,869 potential churners in test set
-Potential revenue saved: 1,483 × $1,500 × 40% retention = $890,000
-Campaign cost: 1,483 × $75 = $111,225
-Net benefit: ~$778,775
-
-With Logistic Regression (55.50% Recall):
-
-Captures only 1,037 churners
-Potential revenue saved: 1,037 × $1,500 × 40% = $623,000
-Lost opportunity: $267,000 compared to XGBoost
-
-Technical Stack
-Backend (Render Deployment)
-
-Python 3.11
-Flask/FastAPI - REST API framework
-Gunicorn - WSGI HTTP server for production
-XGBoost - Gradient boosting model
-scikit-learn - Preprocessing and evaluation
-pandas, numpy - Data processing
-
-Frontend (Streamlit)
-
-Streamlit 1.28+ - Interactive web framework
-Plotly - Interactive visualizations
-Pandas - Data manipulation
-Requests - API communication
-
-ML Model
-
-XGBoost 2.0+ - Primary classifier
-joblib - Model serialization
-
-Deployment Platforms
-
-Backend: Render (https://render.com)
-
-Free tier available
-Auto-scaling
-HTTPS included
-GitHub integration
+    return {
+        "churn_probability": prob,
+        "prediction": pred,
+        "risk_level": "High" if pred == 1 else "Low"
+    }
 
 
-Frontend: Streamlit Cloud (https://streamlit.io/cloud)
+Deployed at:
 
-Free hosting for Streamlit apps
-Easy deployment from GitHub
-Automatic updates on git push
+https://churn-prediction-2qrp.onrender.com/
 
+🖥️ Streamlit Frontend
 
+Real-time prediction
 
-Model Performance Summary
-ModelAccuracyF1 ScoreRecallSelectedNotesXGBoost76.58%0.64279.36%✓ PrimaryBest for churn identificationLogistic Regression81.83%0.61855.50%✓ SecondaryBest accuracy, interpretableDecision Tree72.89%--✗Lower performanceLinear Regression31.12%--✗Unsuitable for classification
-Key Insights from Analysis
-1. Class Imbalance Impact
-The 73.5% / 26.5% class distribution required special handling through:
+Batch CSV upload
 
-scale_pos_weight parameter in XGBoost
-Custom threshold tuning
-Focus on recall over accuracy
+Visual analytics
 
-2. Feature Importance (Top Predictors)
-Based on XGBoost model:
+Deployed at:
 
-Contract type (Month-to-month highest risk)
-Tenure (shorter tenure = higher churn)
-Internet service type (Fiber optic users churn more)
-Monthly charges (higher charges correlate with churn)
-Payment method (Electronic check associated with higher churn)
+https://churn-frontend-g3ku8j45b7mfsg6s4ztjfy.streamlit.app/
 
-3. Model Convergence
-Logistic Regression showed convergence warning, indicating:
-
-Complex feature relationships
-Possible need for feature scaling
-XGBoost's advantage in handling non-linear patterns
-
-Deployment Architecture
-Customer Database
-       ↓
-Feature Extraction Pipeline
-       ↓
-Preprocessed Features (22 dimensions)
-       ↓
-XGBoost Model (churn_xgb.pkl)
-       ↓
-Churn Probability Score
-       ↓
-Threshold Application (0.01)
-       ↓
-Risk Classification (High/Low)
-       ↓
-CRM System / Marketing Automation
-Integration Options
-Real-time Prediction API
-python# Backend API (Flask) - deployed on Render
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import joblib
-
-app = Flask(__name__)
-CORS(app)
-
-model = joblib.load('models/churn_xgb.pkl')
-threshold = joblib.load('models/threshold.pkl')
-
-@app.route('/api/predict', methods=['POST'])
-def predict_churn():
-    data = request.json
-    features = preprocess_features(data)
-    probability = model.predict_proba([features])[0][1]
-    prediction = int(probability >= threshold)
-    
-    return jsonify({
-        'churn_probability': float(probability),
-        'high_risk': bool(prediction),
-        'risk_level': 'High' if prediction else 'Low'
-    })
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({'status': 'healthy'})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-Streamlit Frontend
-python# churn-frontend/app.py
-import streamlit as st
-import requests
-import pandas as pd
-
-st.set_page_config(page_title="Churn Prediction", page_icon="📊")
-
-API_URL = st.secrets["api"]["url"]  # From Streamlit secrets
-
-st.title("📊 Telecom Customer Churn Prediction")
-
-# Input form
-with st.form("prediction_form"):
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        gender = st.selectbox("Gender", ["Female", "Male"])
-        senior = st.selectbox("Senior Citizen", ["No", "Yes"])
-        tenure = st.number_input("Tenure (months)", 0, 100, 12)
-    
-    with col2:
-        monthly_charges = st.number_input("Monthly Charges", 0, 200, 70)
-        contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
-    
-    submit = st.form_submit_button("Predict Churn Risk")
-    
-    if submit:
-        # Prepare data
-        customer_data = prepare_features(gender, senior, tenure, monthly_charges, contract)
-        
-        # Call API
-        response = requests.post(f"{API_URL}/api/predict", json=customer_data)
-        result = response.json()
-        
-        # Display results
-        if result['high_risk']:
-            st.error(f"⚠️ High Churn Risk: {result['churn_probability']:.1%}")
-        else:
-            st.success(f"✅ Low Churn Risk: {result['churn_probability']:.1%}")
-Future Enhancements
-Model Improvements
-
-Feature Engineering:
-
-Create interaction features (e.g., tenure × monthly_charges)
-Engineer temporal features (recent behavior changes)
-Add customer satisfaction scores if available
-
-
-Advanced Techniques:
-
-Ensemble methods combining XGBoost + LightGBM
-Deep learning models (Neural Networks) for pattern recognition
-Time-series analysis for behavior trend detection
-
-
-Hyperparameter Optimization:
-
-Bayesian optimization for XGBoost parameters
-Cross-validation with stratified sampling
-AutoML frameworks for automated tuning
-
-
-
-System Enhancements
-
-Model Monitoring:
-
-Track model performance drift over time
-Implement A/B testing framework
-Set up automated retraining pipeline
-
-
-Explainability:
-
-SHAP values for individual predictions
-LIME for local interpretability
-Feature contribution dashboards for business users
-
-
-Integration:
-
-Real-time prediction API deployment
-Integration with CRM systems (Salesforce, HubSpot)
-Automated alert system for high-risk customers
-Dashboard for business stakeholders
-
-
-
-Repository Structure
-telecom-churn-prediction/
-│
-├── .venv/                          # Virtual environment (not tracked in git)
-│
-├── backend/                        # Backend API (deployed on Render)
-│   ├── app.py                      # Flask/FastAPI application
-│   ├── models/                     # Saved model artifacts
-│   │   ├── churn_xgb.pkl          # Trained XGBoost model
-│   │   └── threshold.pkl          # Optimal prediction threshold
-│   ├── preprocessing.py            # Feature preprocessing pipeline
-│   ├── requirements.txt            # Backend dependencies
-│   └── render.yaml                # Render deployment configuration
-│
-├── churn-frontend/                 # Frontend Streamlit application
-│   ├── app.py                      # Main Streamlit app
-│   ├── pages/                      # Multi-page app structure
-│   │   ├── 01_prediction.py       # Single prediction page
-│   │   ├── 02_batch.py            # Batch prediction page
-│   │   └── 03_analytics.py        # Analytics dashboard
-│   ├── utils/                      # Helper functions
-│   │   ├── api_client.py          # API calls to Render backend
-│   │   └── visualizations.py      # Chart components
-│   ├── requirements.txt            # Frontend dependencies
-│   └── .streamlit/                 # Streamlit configuration
-│       └── config.toml             # Theme and settings
-│
-├── venv/                          # Alternative virtual environment
-│
-├── notebook4b76edc9f8.ipynb       # Main analysis notebook (from Kaggle)
-│   └── Contains:
-│       - Data loading and exploration
-│       - Preprocessing pipeline
-│       - Model training and evaluation
-│       - Performance comparison
-│
-├── .gitignore                     # Git ignore rules
-├── README.md                      # This file
-└── requirements.txt               # Project-wide dependencies
-Requirements
-Backend Requirements (backend/requirements.txt)
-txtflask>=3.0.0
-flask-cors>=4.0.0
-gunicorn>=21.2.0
-xgboost>=2.0.0
-scikit-learn>=1.3.0
-pandas>=2.0.0
-numpy>=1.24.0
-joblib>=1.3.0
-Frontend Requirements (churn-frontend/requirements.txt)
-txtstreamlit>=1.28.0
-pandas>=2.0.0
-numpy>=1.24.0
-requests>=2.31.0
-plotly>=5.17.0
-streamlit-option-menu>=0.3.6
-Development Requirements (notebook)
-txtjupyter>=1.0.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
-Installation & Usage
-Setup
-bash# Clone repository
+🛠️ Installation & Setup
+Clone repository
 git clone https://github.com/yourusername/telecom-churn-prediction.git
 cd telecom-churn-prediction
 
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install backend dependencies
+Backend Setup
 cd backend
 pip install -r requirements.txt
-Running the Backend API
-bashcd backend
-python app.py
+uvicorn app:app --reload
 
-# API will be available at https://churn-prediction-2qrp.onrender.com/
-Running the Frontend
-bashcd churn-frontend
-npm install
-npm start
+Frontend Setup
+cd churn-frontend
+pip install -r requirements.txt
+streamlit run app.py
 
-# Frontend will be available at https://churn-frontend-g3ku8j45b7mfsg6s4ztjfy.streamlit.app/
-Using the Jupyter Notebook
-bash# Install Jupyter in your virtual environment
-pip install jupyter
-
-# Launch notebook
-Kaggle notebook notebook4b76edc9f8.ipynb
-Making Predictions via API
-bash# POST request to predict endpoint
-curl -X POST http://localhost:5000/api/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "gender": 0,
+🧪 API Usage Example
+curl -X POST "https://churn-prediction-2qrp.onrender.com/predict" \
+-H "Content-Type: application/json" \
+-d '{
+    "gender": "Female",
     "SeniorCitizen": 0,
-    "Partner": 1,
+    "Partner": "Yes",
     "tenure": 12,
-    "MonthlyCharges": 70,
-    ...
-  }'
-Performance Monitoring
-Key Metrics to Track in Production
+    "MonthlyCharges": 70
+}'
 
-Recall: Maintain above 75%
-F1 Score: Monitor for degradation below 0.60
-False Positive Rate: Keep under 30% to avoid alert fatigue
-Model Confidence: Track average prediction probabilities
-Business Metrics:
+📈 Business Impact
 
-Retention campaign conversion rate
-Cost per retained customer
-ROI of retention efforts
+Assumptions:
 
+Avg revenue/user = $64/month
 
+Lifetime value ≈ $1500
 
-Conclusion
-This churn prediction solution leverages XGBoost's superior recall (79.36%) to maximize customer retention opportunities. By prioritizing the identification of potential churners over overall accuracy, the model aligns with business objectives of minimizing customer loss and maximizing retention ROI.
-Key Takeaways:
+Retention offer cost: $75
 
-XGBoost selected for 79.36% recall despite lower accuracy
-Model effectively handles class imbalance through weighted training
-Optimized threshold (0.01) ensures comprehensive churner identification
-Significant business value: ~$778K potential revenue protection
-Ready for production deployment with saved model artifacts
+Retention success: 40%
 
-Contact & Support
-For questions, feature requests, or deployment assistance, please contact me through email or open an issue in the repository.
-email id-: workwithanshuman9468@gmail.com
+With XGBoost (79.36% recall)
 
-Project Status: Production Ready ✅
-Last Updated: December 2025
+Correctly identifies 1,483 churners
+
+Potential revenue saved: $890,000
+
+Campaign cost: $111,225
+
+Net Benefit = $778,775 saved
+
+With Logistic Regression (55.50% recall)
+
+Saves only $623,000
+
+👉 XGBoost prevents $267,000 additional revenue loss.
+
+📌 Repository Structure
+telecom-churn-prediction/
+│
+├── backend/
+│   ├── app.py
+│   ├── preprocessing.py
+│   ├── models/
+│   │   ├── churn_xgb.pkl
+│   │   └── threshold.pkl
+│   ├── requirements.txt
+│   └── render.yaml
+│
+├── churn-frontend/
+│   ├── app.py
+│   ├── pages/
+│   │   ├── 01_prediction.py
+│   │   ├── 02_batch.py
+│   │   └── 03_analytics.py
+│   ├── utils/
+│   │   ├── api_client.py
+│   │   └── visualizations.py
+│   ├── requirements.txt
+│   └── .streamlit/
+│       └── config.toml
+│
+├── notebooks/
+│   └── main_analysis.ipynb
+│
+├── README.md
+└── .gitignore
+
+🔮 Future Enhancements
+ML Improvements
+
+SHAP explainability
+
+Ensemble models (XGBoost + LightGBM)
+
+AutoML hyperparameter search
+
+Time-series behavior modeling
+
+System Enhancements
+
+Model drift monitoring
+
+Automated retraining workflow
+
+CRM integration
+
+Alert system for high-risk customers
+
+📬 Contact
+
+For issues, suggestions, or collaboration:
+📧 workwithanshuman9468@gmail.com
+
+✅ Project Status
+
+Production Ready
+
 Model Version: 1.0
-Dataset Version: Telco Customer Churn (Kaggle)
+
+Last Updated: Dec 2025
