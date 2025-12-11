@@ -13,7 +13,7 @@ Project Architecture
                                 ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │                        Backend API                               │
-│                    FastAPI (Port 5000)                     │
+│                    FastAPI                      │
 │        • Prediction endpoint  • Preprocessing  • Model serving   │
 └───────────────────────────────┬──────────────────────────────────┘
                                 │
