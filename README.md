@@ -1,34 +1,37 @@
 Telecom Customer Churn Prediction Model
 Overview
-This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, FAST API backend, and interactive frontend dashboard for real-time churn prediction from streamlit and customer risk analysis.
+This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, REST API backend, and interactive frontend dashboard for real-time churn prediction and customer risk analysis.
 Project Architecture
-┌─────────────────┐
-│  Frontend UI    │  React/Vue Dashboard
-│ (Port 3000)     │  - Customer risk analysis
-└────────┬────────┘  - Batch predictions
-         │           - Visualization
-         │ HTTP
-         ▼
-┌─────────────────┐
-│  Backend API    │  Flask/FastAPI
-│ (Port 5000)     │  - Prediction endpoint
-└────────┬────────┘  - Preprocessing
-         │           - Model serving
-         │
-         ▼
-┌─────────────────┐
-│  ML Model       │  XGBoost Classifier
-│  churn_xgb.pkl  │  - Recall: 79.36%
-└─────────────────┘  - F1: 0.642
+┌──────────────────────────────────────────────────────────────────┐
+│                         Frontend UI                              │
+│                   React/Vue Dashboard (Port 3000)                │
+│  • Customer risk analysis  • Batch predictions  • Visualization  │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                            HTTP/REST
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                        Backend API                               │
+│                    Flask/FastAPI (Port 5000)                     │
+│        • Prediction endpoint  • Preprocessing  • Model serving   │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                          Load Model
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                         ML Model                                 │
+│              XGBoost Classifier (churn_xgb.pkl)                  │
+│               • Recall: 79.36%  • F1 Score: 0.642                │
+└──────────────────────────────────────────────────────────────────┘
 Key Features
-
 ✅ High Recall Model (79.36%) - Captures maximum churners
 ✅ REST API Backend - Easy integration with existing systems
 ✅ Interactive Frontend - User-friendly dashboard for business users
 ✅ Real-time Predictions - Instant churn risk assessment
 ✅ Batch Processing - Score entire customer databases
 ✅ Production Ready - Deployed and tested model artifacts
-
 Customer churn is a critical challenge in the telecom sector, directly impacting revenue and growth. Early identification of at-risk customers allows companies to implement targeted retention campaigns, reducing churn rates and improving customer lifetime value. This project focuses on maximizing recall to ensure we capture as many potential churners as possible.
 Dataset
 Source: Telco Customer Churn Dataset from Kaggle
@@ -321,7 +324,7 @@ Risk Classification (High/Low)
 CRM System / Marketing Automation
 Integration Options
 Real-time Prediction API
-pythonfrom fast import Fast, request, jsonify
+pythonfrom flask import Flask, request, jsonify
 import joblib
 
 app = Flask(__name__)
@@ -407,7 +410,7 @@ telecom-churn-prediction/
 ├── .venv/                          # Virtual environment (not tracked in git)
 │
 ├── backend/                        # Backend API and model serving
-│   ├── app.py                      # FastAPI application
+│   ├── app.py                      # Flask/FastAPI application
 │   ├── models/                     # Saved model artifacts
 │   │   ├── churn_xgb.pkl          # Trained XGBoost model
 │   │   └── threshold.pkl          # Optimal prediction threshold
@@ -511,8 +514,7 @@ Significant business value: ~$778K potential revenue protection
 Ready for production deployment with saved model artifacts
 
 Contact & Support
-For questions, feature requests, or deployment assistance, please contact me through my email or open an issue in the repository.
-emailid-: workwithanshuman9468@gmail.com
+For questions, feature requests, or deployment assistance, please contact the data science team or open an issue in the repository.
 
 Project Status: Production Ready ✅
 Last Updated: December 2025
