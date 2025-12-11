@@ -4,7 +4,7 @@ This project implements a full-stack machine learning solution to predict custom
 Project Architecture
 ┌──────────────────────────────────────────────────────────────────┐
 │                         Frontend UI                              │
-│                   React/Vue Dashboard (Port 3000)                │
+│                   Streamlit UI               │
 │  • Customer risk analysis  • Batch predictions  • Visualization  │
 └───────────────────────────────┬──────────────────────────────────┘
                                 │
@@ -13,7 +13,7 @@ Project Architecture
                                 ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │                        Backend API                               │
-│                    Flask/FastAPI (Port 5000)                     │
+│                    FastAPI (Port 5000)                     │
 │        • Prediction endpoint  • Preprocessing  • Model serving   │
 └───────────────────────────────┬──────────────────────────────────┘
                                 │
@@ -598,7 +598,8 @@ Significant business value: ~$778K potential revenue protection
 Ready for production deployment with saved model artifacts
 
 Contact & Support
-For questions, feature requests, or deployment assistance, please contact the data science team or open an issue in the repository.
+For questions, feature requests, or deployment assistance, please contact me through email or open an issue in the repository.
+email id-: workwithanshuman9468@gmail.com
 
 Project Status: Production Ready ✅
 Last Updated: December 2025
