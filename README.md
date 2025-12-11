@@ -1,6 +1,6 @@
 Telecom Customer Churn Prediction Model
 Overview
-This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, REST API backend, and interactive frontend dashboard for real-time churn prediction and customer risk analysis.
+This project implements a full-stack machine learning solution to predict customer churn in the telecommunications industry using the Telco Customer Churn dataset. The system includes a trained XGBoost model, REST API backend deployed on Render, and an interactive Streamlit frontend dashboard for real-time churn prediction and customer risk analysis.
 Project Architecture
 ┌──────────────────────────────────────────────────────────────────┐
 │                         Frontend UI                              │
@@ -267,19 +267,45 @@ Potential revenue saved: 1,037 × $1,500 × 40% = $623,000
 Lost opportunity: $267,000 compared to XGBoost
 
 Technical Stack
-Core Libraries
+Backend (Render Deployment)
 
 Python 3.11
-pandas 2.x - Data manipulation and analysis
-numpy - Numerical computations
-scikit-learn - Machine learning algorithms and evaluation
-XGBoost - Gradient boosting implementation
-matplotlib, seaborn - Data visualization
+Flask/FastAPI - REST API framework
+Gunicorn - WSGI HTTP server for production
+XGBoost - Gradient boosting model
+scikit-learn - Preprocessing and evaluation
+pandas, numpy - Data processing
 
-Machine Learning Pipeline
-Data Loading → Preprocessing → Feature Engineering → 
-Model Training → Evaluation → Hyperparameter Tuning → 
-Threshold Optimization → Model Serialization
+Frontend (Streamlit)
+
+Streamlit 1.28+ - Interactive web framework
+Plotly - Interactive visualizations
+Pandas - Data manipulation
+Requests - API communication
+
+ML Model
+
+XGBoost 2.0+ - Primary classifier
+joblib - Model serialization
+
+Deployment Platforms
+
+Backend: Render (https://render.com)
+
+Free tier available
+Auto-scaling
+HTTPS included
+GitHub integration
+
+
+Frontend: Streamlit Cloud (https://streamlit.io/cloud)
+
+Free hosting for Streamlit apps
+Easy deployment from GitHub
+Automatic updates on git push
+
+
+
 Model Performance Summary
 ModelAccuracyF1 ScoreRecallSelectedNotesXGBoost76.58%0.64279.36%✓ PrimaryBest for churn identificationLogistic Regression81.83%0.61855.50%✓ SecondaryBest accuracy, interpretableDecision Tree72.89%--✗Lower performanceLinear Regression31.12%--✗Unsuitable for classification
 Key Insights from Analysis
@@ -324,14 +350,18 @@ Risk Classification (High/Low)
 CRM System / Marketing Automation
 Integration Options
 Real-time Prediction API
-pythonfrom flask import Flask, request, jsonify
+python# Backend API (Flask) - deployed on Render
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import joblib
 
 app = Flask(__name__)
-model = joblib.load('churn_xgb.pkl')
-threshold = joblib.load('threshold.pkl')
+CORS(app)
 
-@app.route('/predict', methods=['POST'])
+model = joblib.load('models/churn_xgb.pkl')
+threshold = joblib.load('models/threshold.pkl')
+
+@app.route('/api/predict', methods=['POST'])
 def predict_churn():
     data = request.json
     features = preprocess_features(data)
@@ -343,17 +373,53 @@ def predict_churn():
         'high_risk': bool(prediction),
         'risk_level': 'High' if prediction else 'Low'
     })
-Batch Processing
-python# Daily churn risk scoring for entire customer base
-customers_df = load_customer_data()
-features = preprocess_pipeline(customers_df)
-probabilities = model.predict_proba(features)[:, 1]
 
-high_risk_customers = customers_df[probabilities >= threshold]
-high_risk_customers['churn_probability'] = probabilities[probabilities >= threshold]
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'healthy'})
 
-# Export for marketing team
-high_risk_customers.to_csv('daily_high_risk_customers.csv')
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+Streamlit Frontend
+python# churn-frontend/app.py
+import streamlit as st
+import requests
+import pandas as pd
+
+st.set_page_config(page_title="Churn Prediction", page_icon="📊")
+
+API_URL = st.secrets["api"]["url"]  # From Streamlit secrets
+
+st.title("📊 Telecom Customer Churn Prediction")
+
+# Input form
+with st.form("prediction_form"):
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        gender = st.selectbox("Gender", ["Female", "Male"])
+        senior = st.selectbox("Senior Citizen", ["No", "Yes"])
+        tenure = st.number_input("Tenure (months)", 0, 100, 12)
+    
+    with col2:
+        monthly_charges = st.number_input("Monthly Charges", 0, 200, 70)
+        contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
+    
+    submit = st.form_submit_button("Predict Churn Risk")
+    
+    if submit:
+        # Prepare data
+        customer_data = prepare_features(gender, senior, tenure, monthly_charges, contract)
+        
+        # Call API
+        response = requests.post(f"{API_URL}/api/predict", json=customer_data)
+        result = response.json()
+        
+        # Display results
+        if result['high_risk']:
+            st.error(f"⚠️ High Churn Risk: {result['churn_probability']:.1%}")
+        else:
+            st.success(f"✅ Low Churn Risk: {result['churn_probability']:.1%}")
 Future Enhancements
 Model Improvements
 
@@ -409,22 +475,27 @@ telecom-churn-prediction/
 │
 ├── .venv/                          # Virtual environment (not tracked in git)
 │
-├── backend/                        # Backend API and model serving
+├── backend/                        # Backend API (deployed on Render)
 │   ├── app.py                      # Flask/FastAPI application
 │   ├── models/                     # Saved model artifacts
 │   │   ├── churn_xgb.pkl          # Trained XGBoost model
 │   │   └── threshold.pkl          # Optimal prediction threshold
 │   ├── preprocessing.py            # Feature preprocessing pipeline
-│   └── requirements.txt            # Backend dependencies
+│   ├── requirements.txt            # Backend dependencies
+│   └── render.yaml                # Render deployment configuration
 │
-├── churn-frontend/                 # Frontend web application
-│   ├── public/                     # Static assets
-│   ├── src/                        # React/Vue source code
-│   │   ├── components/            # UI components
-│   │   ├── pages/                 # Application pages
-│   │   └── api/                   # API integration
-│   ├── package.json               # Frontend dependencies
-│   └── README.md                  # Frontend documentation
+├── churn-frontend/                 # Frontend Streamlit application
+│   ├── app.py                      # Main Streamlit app
+│   ├── pages/                      # Multi-page app structure
+│   │   ├── 01_prediction.py       # Single prediction page
+│   │   ├── 02_batch.py            # Batch prediction page
+│   │   └── 03_analytics.py        # Analytics dashboard
+│   ├── utils/                      # Helper functions
+│   │   ├── api_client.py          # API calls to Render backend
+│   │   └── visualizations.py      # Chart components
+│   ├── requirements.txt            # Frontend dependencies
+│   └── .streamlit/                 # Streamlit configuration
+│       └── config.toml             # Theme and settings
 │
 ├── venv/                          # Alternative virtual environment
 │
@@ -439,13 +510,26 @@ telecom-churn-prediction/
 ├── README.md                      # This file
 └── requirements.txt               # Project-wide dependencies
 Requirements
-txtpandas>=2.0.0
-numpy>=1.24.0
-scikit-learn>=1.3.0
+Backend Requirements (backend/requirements.txt)
+txtflask>=3.0.0
+flask-cors>=4.0.0
+gunicorn>=21.2.0
 xgboost>=2.0.0
+scikit-learn>=1.3.0
+pandas>=2.0.0
+numpy>=1.24.0
+joblib>=1.3.0
+Frontend Requirements (churn-frontend/requirements.txt)
+txtstreamlit>=1.28.0
+pandas>=2.0.0
+numpy>=1.24.0
+requests>=2.31.0
+plotly>=5.17.0
+streamlit-option-menu>=0.3.6
+Development Requirements (notebook)
+txtjupyter>=1.0.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
-joblib>=1.3.0
 Installation & Usage
 Setup
 bash# Clone repository
